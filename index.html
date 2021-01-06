@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<script>
+			var print = function (message) {
+				var d = document.createElement("div");
+				d.textContent = message;
+				output.appendChild(d);
+			};
+			var ws;
+
+			const onOpen = (evt) => {
+				print("OPEN");
+				document.getElementById("status").textContent = "Connected";
+				var actionButton = document.getElementById("action");
+				actionButton.textContent = "Disconnect";
+				actionButton.onclick = () => {
+					if (!ws) {
+						return false;
+					}
+					document.getElementById("status").textContent = "Disconnected";
+					console.log('closing')
+					ws.close();
+					return false;
+				};
+			};
+
+			const onClose = (evt) => {
+				print("CLOSE");
+				ws = null;
+			};
+
+			const onMessage = (evt) => {
+				print("RESPONSE: " + evt.data);
+			};
+
+			const onError = (evt) => {
+				if (!ws) {
+					return false;
+				}
+				document.getElementById("status").textContent = "Errored";
+				print("ERROR: " + evt.data);
+				ws.close();
+				return false;
+			};
+
+			window.addEventListener("load", function (evt) {
+				var output = document.getElementById("output");
+				var input = document.getElementById("input");
+
+				(function init() {
+					document.getElementById("action").onclick = function (evt) {
+						if (ws) {
+							return false;
+						}
+						ws = new WebSocket("ws://" + document.location.host + "/echo");
+						ws.onopen = onOpen;
+						ws.onclose = onClose;
+						ws.onmessage = onMessage;
+						ws.onerror = onError;
+						return false;
+					};
+				})();
+
+				document.getElementById("send").onclick = function (evt) {
+					if (!ws) {
+						return false;
+					}
+					print("SEND: " + input.value);
+					ws.send(input.value);
+					return false;
+				};
+			});
+		</script>
+	</head>
+	<body>
+		<table>
+			<tr>
+				<td valign="top" width="50%">
+					<p>Clapper</p>
+
+					<p id="status">Disconnected</p>
+					<button id="action">Connect</button>
+					<input id="input" type="text" value="Hello world!" />
+					<button id="send">Send</button>
+				</td>
+				<td valign="top" width="50%">
+					<div id="output"></div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
