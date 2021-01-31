@@ -1,0 +1,31 @@
+{
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint src/frontend",
+    "clean": "rm -rf build",
+    "dev": "yarn clean && yarn build:dev && ./src/backend/clapper",
+    "build:dev": "yarn build:frontend && yarn build:backend",
+    "build:frontend": "rollup -c",
+    "build:backend": "cd src/backend && go build ."
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^16.0.0",
+    "@rollup/plugin-node-resolve": "^10.0.0",
+    "eslint": "^7.19.0",
+    "eslint-plugin-svelte3": "^3.0.0",
+    "prettier": "^2.2.1",
+    "prettier-eslint": "^12.0.0",
+    "rollup": "^2.3.4",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.0.0"
+  },
+  "dependencies": {
+    "js-cookie": "^2.2.1",
+    "sirv-cli": "^1.0.0"
+  }
+}
