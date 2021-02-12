@@ -4,7 +4,7 @@
   import { createEventDispatcher } from "svelte";
 
   let unsubscribe;
-  let messages = [];
+  let clients = [];
 
   export let user;
 
@@ -15,19 +15,19 @@
   }
 
   const store = initStore(user);
-  unsubscribe = store.subscribe((currentMessage) => {
-    messages = [...messages, currentMessage];
+  unsubscribe = store.subscribe((newClients) => {
+    clients = newClients;
   });
 
   onDestroy(unsubscribe);
 </script>
 
-<h4>Choose the Clapper MC:</h4>
 <p>Connected as {user}</p>
+<h4>Choose the Clapper MC:</h4>
 <div class="mc-choice">
-  <button>Apple</button>
-  <button>Samsung</button>
-  <button>Sony</button>
+  {#each clients as { id, username }}
+    <button {id}>{username}</button>
+  {/each}
 </div>
 
 <div class="commands">

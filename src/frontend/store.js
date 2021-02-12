@@ -1,8 +1,9 @@
 import { writable } from "svelte/store";
 import { logout } from "./helpers";
 import { initWs, sendMessage } from "./socket";
+import { TOPICS } from "./constants";
 
-const messageStore = writable("");
+const messageStore = writable([]);
 
 let wsClient;
 
@@ -14,16 +15,16 @@ export default function initStore(user) {
   wsClient.addEventListener("open", () => {
     sendMessage(
       JSON.stringify({
-        topic: "CLIENT_JOINED",
-        user,
+        topic: TOPICS.CLIENT_JOINED,
+        data: user,
       }),
       wsClient
     );
   });
 
-  wsClient.addEventListener("message", function (event) {
-    console.log(event);
-    messageStore.set(event.data);
+  wsClient.addEventListener("message", (event) => {
+    const { topic, data } = JSON.parse(event.data);
+    messageStore.set(JSON.parse(data));
   });
 
   wsClient.addEventListener("close", () => logout(user, wsClient));

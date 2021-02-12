@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "js-cookie": "^2.2.1",
+    "key-mirror": "^1.0.1",
     "sirv-cli": "^1.0.0"
   }
 }

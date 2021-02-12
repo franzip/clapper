@@ -17,7 +17,7 @@
 </script>
 
 <main>
-  <h1>Welcome to Clapper!</h1>
+  <h1>Welcome to Clapper!👏👏👏</h1>
   {#if isLoggedIn}
     <Clapper {user} on:logout={handleLogout} />
   {:else}
