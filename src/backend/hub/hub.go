@@ -13,9 +13,9 @@ const (
 )
 
 type Client struct {
-	Id         string
-	Username   string
-	Connection *websocket.Conn
+	Id         string          `json:"id"`
+	Username   string          `json:"username"`
+	Connection *websocket.Conn `json:"-"`
 }
 
 type Hub struct {
@@ -24,7 +24,7 @@ type Hub struct {
 
 type Message struct {
 	Topic string `json:"topic"`
-	User  string `json:"user"`
+	Data  string `json:"data"`
 }
 
 func (client Client) send(message []byte) error {
@@ -45,23 +45,43 @@ func (hub *Hub) ProcessMessage(messageData []byte) error {
 		return err
 	}
 
-	fmt.Println(message)
 	switch message.Topic {
 	case CLIENT_LEFT:
-		hub.RemoveClient(message.User)
+		err := hub.RemoveClient(message.Data)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (hub *Hub) RemoveClient(username string) {
+func (hub *Hub) RemoveClient(username string) error {
 	delete(hub.clients, username)
+
+	clients, err := json.Marshal(hub.getAllClients())
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	message := Message{Topic: CLIENT_LEFT, Data: string(clients)}
+
+	return hub.broadcast(message)
 }
 
 func (hub *Hub) AddClient(client Client) error {
 	hub.clients[client.Username] = client
 
-	message := Message{Topic: CLIENT_JOINED, User: client.Username}
+	clients, err := json.Marshal(hub.getAllClients())
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	message := Message{Topic: CLIENT_JOINED, Data: string(clients)}
 
 	return hub.broadcast(message)
 }
@@ -82,4 +102,14 @@ func (hub *Hub) broadcast(message Message) error {
 	}
 
 	return nil
+}
+
+func (hub *Hub) getAllClients() []Client {
+	var clients []Client
+
+	for _, client := range hub.clients {
+		clients = append(clients, client)
+	}
+
+	return clients
 }
